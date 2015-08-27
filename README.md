@@ -2,7 +2,7 @@
 
 
 This is a conversion of the [log4js](http://log4js.berlios.de/index.html)
-framework to work with [node](http://nodejs.org). I've mainly stripped out the browser-specific code and tidied up some of the javascript. 
+framework to work with [node](http://nodejs.org). I've mainly stripped out the browser-specific code and tidied up some of the javascript.
 
 Out of the box it supports the following features:
 
@@ -33,6 +33,13 @@ NOTE: from log4js 0.5 onwards you'll need to explicitly enable replacement of no
 
 npm install log4js
 
+## Testing (special instructions by OT)
+
+Because this package uses an unusual testing framework (vows.js), OpenTable has added tests using the Jasmine framework.
+
+To run jasmine and vows.js, simply use the `npm test` command.
+
+Mosts of the tests are written by the original authors in vows.js in the `test` folder. The supplemental tests that OpenTable has written in Jasmine.js are in the `spec` folder.
 
 ## usage
 
@@ -48,7 +55,7 @@ By default, log4js outputs to stdout with the coloured layout (thanks to [masylu
 ```
 See example.js for a full example, but here's a snippet (also in fromreadme.js):
 ```javascript
-var log4js = require('log4js'); 
+var log4js = require('log4js');
 //console log is loaded by default, so you won't normally need to do this
 //log4js.loadAppender('console');
 log4js.loadAppender('file');
@@ -69,7 +76,7 @@ Output:
 ```bash
 [2010-01-17 11:43:37.987] [ERROR] cheese - Cheese is too ripe!
 [2010-01-17 11:43:37.990] [FATAL] cheese - Cheese was breeding ground for listeria.
-```    
+```
 The first 5 lines of the code above could also be written as:
 ```javascript
 var log4js = require('log4js');
@@ -84,9 +91,9 @@ log4js.configure({
 ## configuration
 
 You can configure the appenders and log levels manually (as above), or provide a
-configuration file (`log4js.configure('path/to/file.json')`), or a configuration object. The 
-configuration file location may also be specified via the environment variable 
-LOG4JS_CONFIG (`export LOG4JS_CONFIG=path/to/file.json`). 
+configuration file (`log4js.configure('path/to/file.json')`), or a configuration object. The
+configuration file location may also be specified via the environment variable
+LOG4JS_CONFIG (`export LOG4JS_CONFIG=path/to/file.json`).
 An example file can be found in `test/log4js.json`. An example config file with log rolling is in `test/with-log-rolling.json`.
 By default, the configuration file is checked for changes every 60 seconds, and if changed, reloaded. This allows changes to logging levels to occur without restarting the application.
 
@@ -124,11 +131,11 @@ If you have already defined an absolute path for one of the FileAppenders in the
       "filename": "/absolute/path/to/log_file.log",
       "maxLogSize": 20480,
       "backups": 10,
-      "category": "absolute-logger"          
+      "category": "absolute-logger"
     }
   ]
 }
-```    
+```
 Documentation for most of the core appenders can be found on the [wiki](https://github.com/nomiddlename/log4js-node/wiki/Appenders), otherwise take a look at the tests and the examples.
 
 ## Documentation
