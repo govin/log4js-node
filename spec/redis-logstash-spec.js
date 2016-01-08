@@ -11,6 +11,7 @@ describe("redis logstash", function(){
   var loggingFunction;
   var httpLogItem;
   var logEvent;
+  var hostname;
 
   beforeEach(function(){
     redisConfig = {
@@ -26,10 +27,10 @@ describe("redis logstash", function(){
     redisRpush = jasmine.createSpy("redisRpush");
     redisOn = jasmine.createSpy("redisOn").and.returnValue({
       rpush: redisRpush
-    })
+    });
     spyOn(redis, "createClient").and.returnValue({
       on: redisOn
-    })
+    });
 
     loggingFunction = appender(redisLayout, redisConfig);
 
@@ -39,7 +40,7 @@ describe("redis logstash", function(){
       method: 'GET',
       durationMs: 142,
       statusCode: 200
-    }
+    };
 
     logEvent = {
       startTime: "mockStartTime",
@@ -47,48 +48,55 @@ describe("redis logstash", function(){
       level: 'DEBUG',
       logger: { category: 'HTTPService.coffee', _events: { log: [{}] } },
       severity: 'DEBUG'
-    }
+    };
+
+    hostname = os.hostname();
   });
 
   it("should create redis client", function(){
-    expect(redis.createClient).toHaveBeenCalledWith(redisConfig.redisPort, redisConfig.redisHost)
+    expect(redis.createClient).toHaveBeenCalledWith(redisConfig.redisPort, redisConfig.redisHost);
     expect(redisOn).toHaveBeenCalledWith("error", console.log)
-  })
+  });
 
   it("should return a logging function", function(){
     expect(typeof loggingFunction).toEqual("function")
-  })
+  });
 
   describe("handle different types of log data", function(){
     it("array", function(){
-      logEvent.data = [httpLogItem]
-      loggingFunction(logEvent)
+      logEvent.data = [httpLogItem];
+      loggingFunction(logEvent);
 
-      var recordedObj = _.extend(redisConfig.baseLogFields, {hostname: os.hostname()}, httpLogItem);
-      var rpushCalledArgs = redisRpush.calls.argsFor(0)
-      rpushCalledArgs[1] = JSON.parse(rpushCalledArgs[1])
+      var recordedObj = _.extend(redisConfig.baseLogFields, {hostname: hostname, host: hostname}, httpLogItem);
+      var rpushCalledArgs = redisRpush.calls.argsFor(0);
+      rpushCalledArgs[1] = JSON.parse(rpushCalledArgs[1]);
       expect(rpushCalledArgs).toEqual(["logstash",recordedObj])
     });
+
     it("string", function(){
-      logEvent.data = httpLogItem.message
-      loggingFunction(logEvent)
+      logEvent.data = httpLogItem.message;
+      loggingFunction(logEvent);
 
       var recordedObj = _.extend(redisConfig.baseLogFields, {
-        hostname: os.hostname(),
+        hostname: hostname,
+        host: hostname,
         message: httpLogItem.message
       });
-      var rpushCalledArgs = redisRpush.calls.argsFor(0)
-      rpushCalledArgs[1] = JSON.parse(rpushCalledArgs[1])
+      var rpushCalledArgs = redisRpush.calls.argsFor(0);
+      rpushCalledArgs[1] = JSON.parse(rpushCalledArgs[1]);
       expect(rpushCalledArgs).toEqual(["logstash",recordedObj])
     });
     it("object", function(){
-      logEvent.data = httpLogItem
-      loggingFunction(logEvent)
+      logEvent.data = httpLogItem;
+      loggingFunction(logEvent);
 
-      var recordedObj = _.extend(redisConfig.baseLogFields, {hostname: os.hostname()}, httpLogItem);
-      var rpushCalledArgs = redisRpush.calls.argsFor(0)
-      rpushCalledArgs[1] = JSON.parse(rpushCalledArgs[1])
+
+      var recordedObj = _.extend(redisConfig.baseLogFields, {hostname: hostname, host: hostname}, httpLogItem);
+      var rpushCalledArgs = redisRpush.calls.argsFor(0);
+      rpushCalledArgs[1] = JSON.parse(rpushCalledArgs[1]);
       expect(rpushCalledArgs).toEqual(["logstash",recordedObj])
     });
   })
-})
+});
+
+
